@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+dist/
+.next/
+build/
+out/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+.turbo/
+postgres_data/
+*.log
