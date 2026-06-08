@@ -1,0 +1,54 @@
+
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: amdox_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: amdox
+      POSTGRES_PASSWORD: amdox_secret_2026
+      POSTGRES_DB: amdox_erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - amdox-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amdox -d amdox_erp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    container_name: amdox_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - amdox-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.0
+    container_name: amdox_keycloak
+    restart: unless-stopped
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB: dev-mem
+    ports:
+      - "8080:8080"
+    command: start-dev
+    networks:
+      - amdox-network
+
+volumes:
+  postgres_data:
+    name: amdox_postgres_data
+
+networks:
+  amdox-network:
+    name: amdox-network
+    driver: bridge
