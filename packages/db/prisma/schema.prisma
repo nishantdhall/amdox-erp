@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id           String     @id @default(uuid())
+  companyName  String
+  companyCode  String     @unique
+  domain       String?    @unique
+  contactEmail String
+  status       String     @default("ACTIVE")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  users        User[]
+  employees    Employee[]
+  @@map("tenants")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  tenantId  String
+  email     String
+  firstName String
+  lastName  String
+  role      String    @default("EMPLOYEE")
+  status    String    @default("ACTIVE")
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  employee  Employee?
+  @@unique([email, tenantId])
+  @@index([tenantId])
+  @@map("users")
+}
+
+model Department {
+  id        String     @id @default(uuid())
+  tenantId  String
+  name      String
+  code      String
+  managerId String?
+  status    String     @default("ACTIVE")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  employees Employee[]
+  @@unique([code, tenantId])
+  @@index([tenantId])
+  @@map("departments")
+}
+
+model Employee {
+  id           String         @id @default(uuid())
+  tenantId     String
+  userId       String         @unique
+  employeeCode String
+  departmentId String?
+  managerId    String?
+  designation  String?
+  phone        String?
+  joiningDate  DateTime?
+  salary       Decimal?       @db.Decimal(15, 2)
+  status       String         @default("ACTIVE")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+  tenant       Tenant         @relation(fields: [tenantId], references: [id])
+  user         User           @relation(fields: [userId], references: [id])
+  department   Department?    @relation(fields: [departmentId], references: [id])
+  attendance   Attendance[]
+  leaves       LeaveRequest[]
+  payrolls     Payroll[]
+  @@unique([employeeCode, tenantId])
+  @@index([tenantId])
+  @@map("employees")
+}
+
+model Attendance {
+  id             String    @id @default(uuid())
+  tenantId       String
+  employeeId     String
+  attendanceDate DateTime
+  clockIn        DateTime?
+  clockOut       DateTime?
+  workingHours   Decimal?  @db.Decimal(5, 2)
+  overtimeHours  Decimal?  @db.Decimal(5, 2)
+  status         String    @default("PRESENT")
+  createdAt      DateTime  @default(now())
+  employee       Employee  @relation(fields: [employeeId], references: [id])
+  @@index([employeeId])
+  @@index([tenantId])
+  @@index([attendanceDate])
+  @@map("attendance")
+}
+
+model LeaveRequest {
+  id         String   @id @default(uuid())
+  tenantId   String
+  employeeId String
+  leaveType  String
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  status     String   @default("PENDING")
+  approvedBy String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  @@index([employeeId])
+  @@index([tenantId])
+  @@map("leave_requests")
+}
+
+model Payroll {
+  id           String   @id @default(uuid())
+  tenantId     String
+  employeeId   String
+  payrollMonth String
+  basicSalary  Decimal  @db.Decimal(15, 2)
+  allowances   Decimal  @default(0) @db.Decimal(15, 2)
+  deductions   Decimal  @default(0) @db.Decimal(15, 2)
+  taxAmount    Decimal  @default(0) @db.Decimal(15, 2)
+  netSalary    Decimal  @db.Decimal(15, 2)
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  employee     Employee @relation(fields: [employeeId], references: [id])
+  @@unique([employeeId, payrollMonth])
+  @@index([tenantId])
+  @@map("payrolls")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  tenantId   String
+  userId     String
+  entityName String
+  entityId   String?
+  action     String
+  oldValue   Json?
+  newValue   Json?
+  createdAt  DateTime @default(now())
+  @@index([tenantId])
+  @@index([userId])
+  @@map("audit_logs")
+}
