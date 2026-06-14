@@ -24,7 +24,7 @@ export async function payrollRoutes(app: FastifyInstance) {
       
       const payroll = await prisma.payroll.create({
         data: {
-          tenantId: 'default-tenant',
+          tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23',
           employeeId,
           payrollMonth,
           basicSalary,

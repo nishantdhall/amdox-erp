@@ -35,7 +35,7 @@ export async function departmentRoutes(app: FastifyInstance) {
       const { name, code, managerId } = request.body
       const department = await prisma.department.create({
         data: {
-          tenantId: 'default-tenant',
+          tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23',
           name,
           code,
           managerId: managerId || null,

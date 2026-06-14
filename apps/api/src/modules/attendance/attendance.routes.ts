@@ -21,7 +21,7 @@ export async function attendanceRoutes(app: FastifyInstance) {
       const { employeeId, attendanceDate, clockIn, clockOut, status } = request.body
       const record = await prisma.attendance.create({
         data: {
-          tenantId: 'default-tenant',
+          tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23',
           employeeId,
           attendanceDate: new Date(attendanceDate),
           clockIn: clockIn ? new Date(clockIn) : null,

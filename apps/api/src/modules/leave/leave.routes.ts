@@ -21,7 +21,7 @@ export async function leaveRoutes(app: FastifyInstance) {
       const { employeeId, leaveType, startDate, endDate, reason } = request.body
       const leave = await prisma.leaveRequest.create({
         data: {
-          tenantId: 'default-tenant',
+          tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23',
           employeeId,
           leaveType,
           startDate: new Date(startDate),
