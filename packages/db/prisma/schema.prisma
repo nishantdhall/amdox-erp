@@ -1,9 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Tenant {
@@ -94,7 +96,6 @@ model Attendance {
   employee       Employee  @relation(fields: [employeeId], references: [id])
   @@index([employeeId])
   @@index([tenantId])
-  @@index([attendanceDate])
   @@map("attendance")
 }
 
