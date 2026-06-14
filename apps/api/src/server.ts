@@ -7,6 +7,7 @@ import { departmentRoutes } from './modules/departments/department.routes'
 import { attendanceRoutes } from './modules/attendance/attendance.routes'
 import { leaveRoutes } from './modules/leave/leave.routes'
 import { payrollRoutes } from './modules/payroll/payroll.routes'
+import { authRoutes } from './modules/auth/auth.routes'
 
 dotenv.config({ path: '../../.env' })
 
@@ -15,6 +16,10 @@ const app = Fastify({ logger: true })
 app.register(cors, { origin: true })
 app.register(helmet)
 
+// Auth routes
+app.register(authRoutes, { prefix: '/api/v1/auth' })
+
+// HR routes
 app.register(employeeRoutes, { prefix: '/api/v1/employees' })
 app.register(departmentRoutes, { prefix: '/api/v1/departments' })
 app.register(attendanceRoutes, { prefix: '/api/v1/attendance' })
