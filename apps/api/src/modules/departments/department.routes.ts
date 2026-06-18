@@ -1,73 +1,61 @@
 import { FastifyInstance } from 'fastify'
-import { prisma } from '../../lib/prisma'
+import { db } from '../../lib/supabase'
 
 export async function departmentRoutes(app: FastifyInstance) {
 
-  // GET all departments
   app.get('/', async (request, reply) => {
     try {
-      const departments = await prisma.department.findMany({
-        include: { employees: true }
-      })
-      return { success: true, data: departments, count: departments.length }
-    } catch (error) {
-      reply.status(500).send({ success: false, error: 'Failed to fetch departments' })
+      const { data, error } = await db.from('departments').select('*')
+      if (error) return reply.status(500).send({ success: false, error: error.message })
+      return { success: true, data: data || [], count: data?.length || 0 }
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // GET single department
   app.get('/:id', async (request: any, reply) => {
     try {
-      const department = await prisma.department.findUnique({
-        where: { id: request.params.id },
-        include: { employees: true }
-      })
-      if (!department) return reply.status(404).send({ success: false, error: 'Department not found' })
-      return { success: true, data: department }
-    } catch (error) {
-      reply.status(500).send({ success: false, error: 'Failed to fetch department' })
+      const { data, error } = await db.from('departments').select('*').eq('id', request.params.id).single()
+      if (error) return reply.status(404).send({ success: false, error: 'Not found' })
+      return { success: true, data }
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // POST create department
   app.post('/', async (request: any, reply) => {
     try {
       const { name, code, managerId } = request.body
-      const department = await prisma.department.create({
-        data: {
-          tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23',
-          name,
-          code,
-          managerId: managerId || null,
-        }
-      })
-      return reply.status(201).send({ success: true, data: department })
-    } catch (error: any) {
-      reply.status(500).send({ success: false, error: error.message })
+      const { data, error } = await db
+        .from('departments')
+        .insert({ tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23', name, code, managerId: managerId || null, status: 'ACTIVE' })
+        .select()
+        .single()
+      if (error) return reply.status(500).send({ success: false, error: error.message })
+      return reply.status(201).send({ success: true, data })
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // PUT update department
   app.put('/:id', async (request: any, reply) => {
     try {
       const { name, code, managerId } = request.body
-      const department = await prisma.department.update({
-        where: { id: request.params.id },
-        data: { name, code, managerId },
-      })
-      return { success: true, data: department }
-    } catch (error: any) {
-      reply.status(500).send({ success: false, error: error.message })
+      const { data, error } = await db.from('departments').update({ name, code, managerId }).eq('id', request.params.id).select().single()
+      if (error) return reply.status(500).send({ success: false, error: error.message })
+      return { success: true, data }
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // DELETE department
   app.delete('/:id', async (request: any, reply) => {
     try {
-      await prisma.department.delete({ where: { id: request.params.id } })
-      return { success: true, message: 'Department deleted' }
-    } catch (error: any) {
-      reply.status(500).send({ success: false, error: error.message })
+      const { error } = await db.from('departments').delete().eq('id', request.params.id)
+      if (error) return reply.status(500).send({ success: false, error: error.message })
+      return { success: true, message: 'Deleted' }
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 }

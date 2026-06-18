@@ -1,89 +1,90 @@
 import { FastifyInstance } from 'fastify'
-import { prisma } from '../../lib/prisma'
+import { db } from '../../lib/supabase'
 
 export async function employeeRoutes(app: FastifyInstance) {
 
-  // GET all employees
   app.get('/', async (request, reply) => {
     try {
-      const employees = await prisma.employee.findMany({
-        include: { user: true, department: true }
-      })
-      return { success: true, data: employees, count: employees.length }
-    } catch (error) {
-      reply.status(500).send({ success: false, error: 'Failed to fetch employees' })
+      const { data, error } = await db
+        .from('employees')
+        .select('*, user:users(*), department:departments(*)')
+      if (error) return reply.status(500).send({ success: false, error: error.message })
+      return { success: true, data: data || [], count: data?.length || 0 }
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // GET single employee
   app.get('/:id', async (request: any, reply) => {
     try {
-      const employee = await prisma.employee.findUnique({
-        where: { id: request.params.id },
-        include: { user: true, department: true }
-      })
-      if (!employee) return reply.status(404).send({ success: false, error: 'Employee not found' })
-      return { success: true, data: employee }
-    } catch (error) {
-      reply.status(500).send({ success: false, error: 'Failed to fetch employee' })
+      const { data, error } = await db
+        .from('employees')
+        .select('*, user:users(*), department:departments(*)')
+        .eq('id', request.params.id)
+        .single()
+      if (error) return reply.status(404).send({ success: false, error: 'Employee not found' })
+      return { success: true, data }
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // POST create employee
   app.post('/', async (request: any, reply) => {
     try {
       const { firstName, lastName, email, employeeCode, departmentId, designation, phone, salary } = request.body
-      
-      const user = await prisma.user.create({
-        data: {
-          tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23',
-          email,
-          firstName,
-          lastName,
-          role: 'EMPLOYEE'
-        }
-      })
+      const tenantId = '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23'
 
-      const employee = await prisma.employee.create({
-        data: {
-          tenantId: '55ac8fa1-60e1-47f4-8dab-3dfdb3ec1f23',
+      const { data: user, error: userErr } = await db
+        .from('users')
+        .insert({ tenantId, email, firstName, lastName, role: 'EMPLOYEE', status: 'ACTIVE' })
+        .select()
+        .single()
+      if (userErr) return reply.status(500).send({ success: false, error: userErr.message })
+
+      const { data: employee, error: empErr } = await db
+        .from('employees')
+        .insert({
+          tenantId,
           userId: user.id,
           employeeCode,
           departmentId: departmentId || null,
           designation: designation || null,
           phone: phone || null,
           salary: salary || null,
-        },
-        include: { user: true, department: true }
-      })
+          status: 'ACTIVE'
+        })
+        .select('*, user:users(*), department:departments(*)')
+        .single()
+      if (empErr) return reply.status(500).send({ success: false, error: empErr.message })
       return reply.status(201).send({ success: true, data: employee })
-    } catch (error: any) {
-      reply.status(500).send({ success: false, error: error.message })
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // PUT update employee
   app.put('/:id', async (request: any, reply) => {
     try {
       const { designation, phone, salary, departmentId } = request.body
-      const employee = await prisma.employee.update({
-        where: { id: request.params.id },
-        data: { designation, phone, salary, departmentId },
-        include: { user: true, department: true }
-      })
-      return { success: true, data: employee }
-    } catch (error: any) {
-      reply.status(500).send({ success: false, error: error.message })
+      const { data, error } = await db
+        .from('employees')
+        .update({ designation, phone, salary, departmentId })
+        .eq('id', request.params.id)
+        .select('*, user:users(*), department:departments(*)')
+        .single()
+      if (error) return reply.status(500).send({ success: false, error: error.message })
+      return { success: true, data }
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 
-  // DELETE employee
   app.delete('/:id', async (request: any, reply) => {
     try {
-      await prisma.employee.delete({ where: { id: request.params.id } })
+      const { error } = await db.from('employees').delete().eq('id', request.params.id)
+      if (error) return reply.status(500).send({ success: false, error: error.message })
       return { success: true, message: 'Employee deleted' }
-    } catch (error: any) {
-      reply.status(500).send({ success: false, error: error.message })
+    } catch (e: any) {
+      reply.status(500).send({ success: false, error: e.message })
     }
   })
 }
