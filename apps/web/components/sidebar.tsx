@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
 
 const navItems = [
   { icon: '📊', label: 'Dashboard', href: '/dashboard' },
@@ -19,11 +20,19 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
+  const { user, logout } = useAuth()
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard'
     return pathname.startsWith(href)
   }
+
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'N'
+
+  const displayName = user?.name || 'Nishant D.'
+  const displayRole = user?.role || 'TenantAdmin'
 
   return (
     <div
@@ -90,15 +99,23 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       <div className="border-t border-white/8 px-4 py-3">
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <div className="w-8 h-8 rounded-full bg-[#4f6ef7] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-            N
+            {initials}
           </div>
           {!isCollapsed && (
-            <div className="min-w-0">
-              <div className="text-[12px] text-white font-semibold truncate">Nishant D.</div>
-              <div className="text-[10px] text-white/35">TenantAdmin</div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[12px] text-white font-semibold truncate">{displayName}</div>
+              <div className="text-[10px] text-white/35">{displayRole}</div>
             </div>
           )}
         </div>
+        {!isCollapsed && (
+          <button
+            onClick={logout}
+            className="mt-2 w-full text-[10px] text-white/30 hover:text-[#e5484d] py-1.5 rounded-lg hover:bg-white/5 transition-all text-center"
+          >
+            ↩ Sign Out
+          </button>
+        )}
       </div>
 
       {/* Footer */}
