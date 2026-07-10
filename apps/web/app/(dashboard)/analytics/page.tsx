@@ -1,4 +1,5 @@
 'use client'
+import { RBACGuard } from "@/components/rbac-guard"
 
 const regionData = [
   { label: 'North', value: 55, color: '#4f6ef7' },
@@ -25,6 +26,7 @@ export default function AnalyticsPage() {
   }, '')
 
   return (
+    <RBACGuard module="analytics">
     <div className="animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5">
@@ -113,5 +115,9 @@ export default function AnalyticsPage() {
         </div>
       </div>
     </div>
+    </RBACGuard>
   )
 }
+
+// RBAC Wrapper
+const _OriginalPage = exports.default || (() => null)

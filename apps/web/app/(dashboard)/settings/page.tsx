@@ -1,4 +1,5 @@
 'use client'
+import { RBACGuard } from "@/components/rbac-guard"
 import { useState } from 'react'
 import { orgSettings } from '@/lib/mock-data'
 
@@ -15,6 +16,7 @@ export default function SettingsPage() {
   const labelClass = "block text-[11px] font-semibold text-[#555] mb-1.5 uppercase tracking-wider"
 
   return (
+    <RBACGuard module="settings">
     <div className="animate-fade-in max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
@@ -162,5 +164,9 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+    </RBACGuard>
   )
 }
+
+// RBAC Wrapper
+const _OriginalPage = exports.default || (() => null)

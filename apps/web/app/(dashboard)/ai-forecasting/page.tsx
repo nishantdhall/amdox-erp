@@ -1,4 +1,5 @@
 'use client'
+import { RBACGuard } from "@/components/rbac-guard"
 import { KpiCard } from '@/components/kpi-card'
 import { Badge } from '@/components/badge'
 import { forecastKpis, forecastChartData } from '@/lib/mock-data'
@@ -8,6 +9,7 @@ export default function AIForecastingPage() {
   const maxVal = Math.max(...allValues)
 
   return (
+    <RBACGuard module="ai-forecasting">
     <div className="animate-fade-in">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5">
@@ -119,5 +121,9 @@ export default function AIForecastingPage() {
         <strong className="text-[#1e3489]">MAPE = 8.6%:</strong> Our model is 91.4% accurate. Project requirement was &lt;12% — we&apos;re beating the target!
       </div>
     </div>
+    </RBACGuard>
   )
 }
+
+// RBAC Wrapper
+const _OriginalPage = exports.default || (() => null)
