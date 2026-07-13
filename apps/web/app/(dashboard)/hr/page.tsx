@@ -26,6 +26,7 @@ const MOCK_EMPLOYEES = [
 
 export default function HRPage() {
   const [employees, setEmployees] = useState<any[]>([])
+  const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -98,7 +99,7 @@ export default function HRPage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Employees — {employees.length} Active</h2>
             <div className="flex gap-2">
-              <input placeholder="Search..." className="border rounded-lg px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input placeholder="Search employees..." value={search} onChange={e => setSearch(e.target.value)} className="border rounded-lg px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-blue-500" />
               <button onClick={() => setShowForm(!showForm)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">
                 {showForm ? "Cancel" : "+ Onboard"}
@@ -164,7 +165,12 @@ export default function HRPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map((emp, i) => (
+                  {employees.filter(emp => {
+                    const name = `${emp.user?.firstName||emp.firstName||""} ${emp.user?.lastName||emp.lastName||""}`.toLowerCase()
+                    const dept = (emp.department||"").toLowerCase()
+                    const desig = (emp.designation||"").toLowerCase()
+                    return !search || name.includes(search.toLowerCase()) || dept.includes(search.toLowerCase()) || desig.includes(search.toLowerCase())
+                  }).map((emp, i) => (
                     <tr key={emp.id || i} className="border-b hover:bg-gray-50">
                       <td className="px-5 py-3 text-sm font-medium text-gray-900">
                         {emp.user?.firstName || emp.firstName} {emp.user?.lastName || emp.lastName}

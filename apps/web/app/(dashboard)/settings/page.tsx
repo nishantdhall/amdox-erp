@@ -168,5 +168,3 @@ export default function SettingsPage() {
   )
 }
 
-// RBAC Wrapper
-const _OriginalPage = exports.default || (() => null)

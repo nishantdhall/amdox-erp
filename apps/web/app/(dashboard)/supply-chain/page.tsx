@@ -127,9 +127,11 @@ export default function SupplyChainPage() {
                     </td>
                     <td className="px-5 py-3">
                       {item.status !== "OK" ? (
-                        <button className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Create PO</button>
+                        <button onClick={() => { alert(`PO created for ${item.product}!\nQty: ${item.reorderAt * 2} units\nVendor will be notified.`) }}
+                        className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Create PO</button>
                       ) : (
-                        <button className="text-xs px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">View</button>
+                        <button onClick={() => { alert(`SKU: ${item.id}\nProduct: ${item.product}\nIn Stock: ${item.inStock} units\nReorder At: ${item.reorderAt} units\nStatus: ${item.status}`) }}
+                        className="text-xs px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">View</button>
                       )}
                     </td>
                   </tr>

@@ -117,7 +117,10 @@ export default function FinancePage() {
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">
                 {showForm ? "Cancel" : "+ Journal Entry"}
               </button>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Export ↓</button>
+              <button onClick={() => {
+                const csv = ["Date,Account,Description,Debit,Credit,Status", ...entries.map(e => `${e.entryDate||e.date},${e.account},"${e.description}",${e.debit||""},${e.credit||""},${e.status}`)].join("\n")
+                const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = "journal_entries.csv"; a.click()
+              }} className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Export ↓</button>
             </div>
           </div>
 
