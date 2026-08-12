@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --sidebar-width: 250px;
+  }
+
+  * {
+    @apply border-ink-line;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface-sunken text-ink antialiased;
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'tnum' 0;
+  }
+
+  /* Tabular figures everywhere numbers are compared column-wise. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    @apply bg-brand-500/20;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500/60 ring-offset-1 ring-offset-white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-ink-muted/30;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-muted/50;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-ink-line bg-white shadow-card;
+  }
+
+  .card-header {
+    @apply flex items-center justify-between gap-3 border-b border-ink-line px-5 py-3.5;
+  }
+
+  .card-title {
+    @apply text-[13px] font-semibold tracking-tight text-ink;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-ink-muted;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-ink-line bg-white px-3 py-2 text-sm text-ink
+      placeholder:text-ink-muted/70 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20
+      disabled:cursor-not-allowed disabled:bg-surface-sunken;
+  }
+
+  .table-wrap {
+    @apply w-full overflow-x-auto;
+  }
+
+  .table {
+    @apply w-full min-w-full border-collapse text-sm;
+  }
+
+  .table thead th {
+    @apply whitespace-nowrap border-b border-ink-line bg-surface-raised px-4 py-2.5 text-left text-[11px]
+      font-semibold uppercase tracking-wider text-ink-muted;
+  }
+
+  .table tbody td {
+    @apply border-b border-ink-line/70 px-4 py-3 align-middle text-ink;
+  }
+
+  .table tbody tr:hover {
+    @apply bg-brand-50/50;
+  }
+
+  .table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .skeleton {
+    @apply animate-shimmer rounded bg-gradient-to-r from-ink-line/40 via-ink-line/80 to-ink-line/40 bg-[length:1000px_100%];
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    @apply bg-white;
+  }
+}
