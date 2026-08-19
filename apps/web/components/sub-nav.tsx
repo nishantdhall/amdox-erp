@@ -10,11 +10,11 @@ interface NavItem {
 interface SubNavProps {
   items: NavItem[]
   title: string
-  icon: string
-  currentPath: string
+  icon?: string
+  currentPath?: string
 }
 
-export function SubNav({ items, title, icon, currentPath }: SubNavProps) {
+export function SubNav({ items, title, icon, currentPath='' }: SubNavProps) {
   return (
     <div className="w-[180px] flex-shrink-0 bg-[#1a1d2e] rounded-xl overflow-hidden self-start animate-slide-left">
       <div className="px-4 py-3 border-b border-white/10">
